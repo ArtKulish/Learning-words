@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="uk"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Вивчаємо слова</title>
+<style>
+:root{--bg:#fff7e6;--card:#fff;--ink:#2b2b3a;--mut:#6b6b80;--pri:#6c5ce7;--ok:#27ae60;--bd:#f0e0c0;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1b2b;--card:#2a2840;--ink:#f3f0ff;--mut:#b5b0d0;--bd:#3d3a5c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1d1b2b;--card:#2a2840;--ink:#f3f0ff;--mut:#b5b0d0;--bd:#3d3a5c;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:16px}
+h1{font-size:28px;margin:8px 0 16px}h2{font-size:20px;margin:24px 0 10px}h3{margin:18px 0 8px}
+.box{background:var(--card);border:2px solid var(--bd);border-radius:20px;padding:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input{font:inherit;color:inherit;background:transparent;border:2px solid var(--bd);border-radius:12px;padding:10px 12px;min-width:0}
+#w{flex:1;font-size:20px}
+.b{font:inherit;font-weight:700;border:0;border-radius:14px;padding:11px 16px;cursor:pointer;background:var(--bd);color:var(--ink)}
+.b.pri{background:var(--pri);color:#fff}.b.ok{background:var(--ok);color:#fff;margin-top:12px}.b:disabled{opacity:.5;cursor:default}
+.sm{color:var(--mut);font-size:14px}
+.prev{display:flex;gap:14px;align-items:center;margin-top:12px}
+.pic{font-size:64px;line-height:1;width:96px;height:96px;display:grid;place-items:center;border-radius:24px;background:#ffe9a8;flex:none}
+.pic.big{width:100%;height:190px;font-size:120px;color:#2b2b3a}
+.en{font-size:26px;font-weight:800}.en.big{font-size:38px;text-align:center;margin:10px 0}
+.snd{border:0;background:var(--bd);color:var(--ink);border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;vertical-align:middle;margin-left:4px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:4px;border:2px solid var(--bd);border-radius:999px;padding:4px 4px 4px 14px;font-size:18px;cursor:pointer;user-select:none}
+.chip.on{border-color:var(--pri);background:var(--pri);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{border-radius:20px;padding:12px;text-align:center;cursor:pointer;color:#2b2b3a;border:2px solid rgba(0,0,0,.06)}
+.card .pic{width:100%;background:rgba(255,255,255,.55);font-size:56px;height:84px;margin-bottom:6px}
+.card b{display:block;font-size:20px}.card small{color:#4a4a5e}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);overflow:auto;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);z-index:5}
+.ov[hidden]{display:none}
+.sheet{position:relative;max-width:560px;margin:16px auto;background:var(--card);border-radius:24px;padding:16px}
+.x{position:absolute;right:12px;top:12px;z-index:2;border:0;border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer;background:#fff;color:#222}
+.ukl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:22px;font-weight:700}
+.uk{background:var(--bd);border-radius:999px;padding:4px 4px 4px 14px}
+#slots,#tiles{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0}
+.slot,.tile{width:54px;height:62px;border-radius:14px;font:800 30px system-ui,sans-serif;text-transform:uppercase;cursor:pointer;border:3px dashed var(--bd);background:transparent;color:var(--ink)}
+.slot.f{border-style:solid;border-color:var(--pri)}.slot.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.tile{border:0;background:#ffb84d;color:#2b2b3a;box-shadow:0 4px 0 #d98e12}.tile:active{transform:translateY(3px);box-shadow:none}
+#msg{text-align:center;font-size:22px;font-weight:800;min-height:34px}
+.pic img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.shake{animation:sh .35s}@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+</style></head>
+<body>
+<main>
+<h1>📚 Вивчаємо слова</h1>
+<section class="box">
+ <div class="row"><input id="w" list="dl" placeholder="Слово: apple або яблуко" autocapitalize="off" autocomplete="off" spellcheck="false"><button id="go" class="b pri">Перекласти</button></div>
+ <div id="res"></div><datalist id="dl"></datalist>
+</section>
+<div class="row" style="justify-content:space-between;margin:24px 0 10px"><h2 style="margin:0">Мої слова <span id="cnt" class="sm"></span></h2><button class="b pri" id="prac">🎲 Тренування</button></div>
+<div id="grid" class="grid"></div>
+</main>
+<div id="ov" class="ov" hidden></div>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const COL=["#ffd6e0","#d4f1c5","#cfe8ff","#ffe9a8","#e3d4ff","#ffd9b8"];
+let words=[];try{words=JSON.parse(localStorage.getItem("kw")||"[]")}catch(e){}
+const persist=()=>{try{localStorage.setItem("kw",JSON.stringify(words))}catch(e){}};
+let cur=null,L=null;
+
+function say(t,l){try{const u=new SpeechSynthesisUtterance(t);u.lang=l;u.rate=.8;
+ const vs=speechSynthesis.getVoices();const v=vs.find(v=>v.lang.replace("_","-").toLowerCase().startsWith(l.toLowerCase()))||vs.find(v=>v.lang.toLowerCase().startsWith(l.slice(0,2)));
+ if(v)u.voice=v;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+const pic=w=>w.img?`<img src="${w.img}" alt="">`:w.emoji?esc(w.emoji):`<b>${esc(w.en[0].toUpperCase())}</b>`;
+const sb=(t,l)=>`<button class="snd" data-say="${esc(t)}" data-l="${l}" aria-label="Озвучити">🔊</button>`;
+
+async function trAI(){
+ const q=$("w").value.trim();if(!q)return;
+ $("go").disabled=true;$("res").innerHTML='<p class="sm">Шукаю переклад…</p>';
+ try{
+  const s=await claude.use("sample");
+  if(!s){$("res").innerHTML='<p>Переклад тут недоступний. Відкрий сторінку в claude.ai.</p>';return}
+  let r=await s.json('Translate the English word or short phrase "'+q.replace(/"/g,"")+'" into Ukrainian. Reply with ONLY JSON, no markdown: {"en":"the English word, spelling corrected, lowercase","uk":["up to 5 distinct common Ukrainian translations, most common first, short"],"emoji":"1-2 emoji that best picture this word for a small child"}');
+  if(typeof r==="string")r=JSON.parse(r.replace(/```json|```/g,"").trim());
+  const opts=[...new Set((r.uk||[]).map(String))].slice(0,6);
+  if(!opts.length)throw 0;
+  cur={en:String(r.en||q).toLowerCase(),opts,sel:new Set([0]),emoji:r.emoji||"🖼️"};
+  renderRes();
+ }catch(e){$("res").innerHTML='<p>Не вдалося перекласти. Спробуй ще раз.</p>'}
+ finally{$("go").disabled=false}
+}
+function renderRes(){
+ $("res").innerHTML=`<div class="prev"><div class="pic" id="pic">${pic(cur)}</div><div><div class="en">${esc(cur.en)} ${sb(cur.en,"en-US")}</div><label class="sm">Картинка (емодзі): <input id="emo" value="${esc(cur.emoji)}" maxlength="8" size="4"></label><br><button class="b" id="photo" style="margin-top:6px">📷 Своє фото</button><input type="file" id="file" accept="image/*" hidden></div></div>
+ <p class="sm">${cur.manual?"Цього слова немає у словнику. Впиши переклад сам:":"Обери потрібні переклади:"}</p>
+ <div class="chips">${cur.opts.map((o,i)=>`<span class="chip ${cur.sel.has(i)?"on":""}" data-i="${i}">${esc(o)}${sb(o,"uk-UA")}</span>`).join("")}</div>
+ <div class="row" style="margin-top:10px"><input id="own" placeholder="Свій переклад" size="14"><button class="b" id="addown">+</button></div><button id="save" class="b ok" ${cur.sel.size?"":"disabled"}>➕ Додати до моїх слів</button>`;
+}
+function renderGrid(){
+ $("cnt").textContent=words.length?"("+words.length+")":"";
+ $("grid").innerHTML=words.length?words.map((w,i)=>`<div class="card" data-open="${i}" style="background:${COL[i%6]}"><div class="pic">${pic(w)}</div><b>${esc(w.en)}</b><small>${esc(w.uk.join(", "))}</small></div>`).join(""):'<p class="sm">Поки що порожньо. Додай перше слово зверху.</p>';
+}
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function startGame(i){
+ const ch=[...words[i].en.replace(/\s+/g,"")];
+ let t=ch.map((c,k)=>({id:k,c}));
+ for(let n=0;n<8&&ch.length>1;n++){shuffle(t);if(t.map(x=>x.c).join("")!==ch.join(""))break}
+ L={i,ch,tiles:t,slots:ch.map(()=>null),done:false,del:false};
+}
+function renderLearn(){
+ const w=words[L.i];$("ov").hidden=false;
+ $("ov").innerHTML=`<div class="sheet"><button class="x" data-act="close" aria-label="Закрити">✕</button>
+ <div class="pic big" style="background:${COL[L.i%6]}">${pic(w)}</div>
+ <div class="en big">${esc(w.en)} ${sb(w.en,"en-US")}</div>
+ <div class="ukl">${w.uk.map(u=>`<span class="uk">${esc(u)}${sb(u,"uk-UA")}</span>`).join("")}</div>
+ <h3 style="text-align:center">Збери слово з літер</h3>
+ <div id="slots"></div><div id="tiles"></div><div id="msg"></div>
+ <div class="row" style="justify-content:center"><button class="b" data-act="shuf">🔀 Перемішати</button><button class="b pri" data-act="next">Далі ➡️</button><button class="b" data-act="edit">✏️ Редагувати</button><button class="b" data-act="del">🗑️</button></div></div>`;
+ renderGame();
+}
+function renderGame(msg,bad){
+ const tl=id=>L.tiles.find(t=>t.id===id).c;
+ $("slots").innerHTML=L.ch.map((_,j)=>{const id=L.slots[j];return `<button class="slot ${id!==null?"f":""} ${L.done?"ok":""}" data-slot="${j}">${id!==null?esc(tl(id)):""}</button>`}).join("");
+ $("tiles").innerHTML=L.tiles.filter(t=>!L.slots.includes(t.id)).map(t=>`<button class="tile" data-tile="${t.id}">${esc(t.c)}</button>`).join("");
+ const m=$("msg");m.textContent=msg||"";m.className=bad?"shake":"";
+}
+
+document.addEventListener("click",e=>{
+ const t=e.target;
+ const s=t.closest("[data-say]");if(s){say(s.dataset.say,s.dataset.l);return}
+ const chip=t.closest(".chip");
+ if(chip){const i=+chip.dataset.i;cur.sel.has(i)?cur.sel.delete(i):cur.sel.add(i);renderRes();return}
+ if(t.id==="photo"){$("file").click();return}
+ if(t.id==="addown"){const v=$("own").value.trim();if(v){cur.opts.push(v);cur.sel.add(cur.opts.length-1);renderRes()}return}
+ if(t.id==="save"){
+  const e2={en:cur.en,uk:[...cur.sel].sort().map(i=>cur.opts[i]),emoji:cur.emoji,img:cur.img};
+  words=words.filter(w=>w.en!==e2.en);words.unshift(e2);persist();renderGrid();
+  cur=null;$("res").innerHTML='<p class="sm">✅ Додано!</p>';$("w").value="";return}
+ const card=t.closest("[data-open]");if(card){startGame(+card.dataset.open);renderLearn();return}
+ const tile=t.closest("[data-tile]");
+ if(tile&&L&&!L.done){
+  const j=L.slots.indexOf(null);if(j<0)return;
+  L.slots[j]=+tile.dataset.tile;
+  if(L.slots.includes(null)){renderGame();return}
+  const g=L.slots.map(id=>L.tiles.find(x=>x.id===id).c).join("");
+  if(g===L.ch.join("")){L.done=true;renderGame("🎉 Молодець!");say(words[L.i].en,"en-US")}
+  else renderGame("Спробуй ще 🙂",true);
+  return}
+ const slot=t.closest("[data-slot]");
+ if(slot&&L&&!L.done){L.slots[+slot.dataset.slot]=null;renderGame();return}
+ const a=t.closest("[data-act]");if(!a)return;
+ if(a.dataset.act==="close"){$("ov").hidden=true;L=null}
+ else if(a.dataset.act==="shuf"){startGame(L.i);renderGame()}
+ else if(a.dataset.act==="next"){startGame(words.length>1?(L.i+1+Math.floor(Math.random()*(words.length-1)))%words.length:0);renderLearn()}
+ else if(a.dataset.act==="edit"){const w=words[L.i];cur={en:w.en,opts:w.uk.slice(),sel:new Set(w.uk.map((_,i)=>i)),emoji:w.emoji,img:w.img};$("w").value=w.en;$("ov").hidden=true;L=null;renderRes();window.scrollTo(0,0)}
+ else if(a.dataset.act==="del"){
+  if(!L.del){L.del=true;a.textContent="Точно видалити?";return}
+  words.splice(L.i,1);persist();renderGrid();$("ov").hidden=true;L=null}
+});
+document.addEventListener("input",e=>{if(e.target.id==="emo"&&cur){cur.emoji=e.target.value||"🖼️";cur.img=null;$("pic").innerHTML=pic(cur)}});
+const DICT=`dog|собака,пес|🐶;cat|кіт,кішка|🐱;mouse|миша|🐭;rabbit|кролик,заєць|🐰;fox|лисиця,лис|🦊;bear|ведмідь|🐻;panda|панда|🐼;tiger|тигр|🐯;lion|лев|🦁;cow|корова|🐮;pig|свиня|🐷;frog|жаба|🐸;monkey|мавпа|🐵;chicken|курка|🐔;penguin|пінгвін|🐧;bird|птах,пташка|🐦;duck|качка|🦆;owl|сова|🦉;wolf|вовк|🐺;horse|кінь|🐴;unicorn|єдиноріг|🦄;bee|бджола|🐝;butterfly|метелик|🦋;snail|равлик|🐌;ant|мураха|🐜;spider|павук|🕷️;fish|риба|🐟;dolphin|дельфін|🐬;whale|кит|🐳;shark|акула|🦈;octopus|восьминіг|🐙;turtle|черепаха|🐢;snake|змія|🐍;crocodile|крокодил|🐊;elephant|слон|🐘;giraffe|жирафа|🦒;zebra|зебра|🦓;camel|верблюд|🐫;kangaroo|кенгуру|🦘;sheep|вівця|🐑;goat|коза|🐐;deer|олень|🦌;squirrel|білка|🐿️;hedgehog|їжак|🦔;bat|кажан|🦇;dinosaur|динозавр|🦖;crab|краб|🦀
+apple|яблуко|🍎;banana|банан|🍌;orange|апельсин,помаранча|🍊;lemon|лимон|🍋;pear|груша|🍐;peach|персик|🍑;cherry|вишня,черешня|🍒;strawberry|полуниця,суниця|🍓;grapes|виноград|🍇;watermelon|кавун|🍉;pineapple|ананас|🍍;tomato|помідор|🍅;potato|картопля|🥔;carrot|морква|🥕;corn|кукурудза|🌽;cucumber|огірок|🥒;onion|цибуля|🧅;broccoli|броколі|🥦;mushroom|гриб|🍄;bread|хліб|🍞;cheese|сир|🧀;egg|яйце|🥚;milk|молоко|🥛;butter|масло|🧈;meat|м’ясо|🥩;sausage|ковбаса,сосиска|🌭;pizza|піца|🍕;burger|бургер|🍔;fries|картопля фрі|🍟;soup|суп|🍲;rice|рис|🍚;cake|торт|🎂;cookie|печиво|🍪;chocolate|шоколад|🍫;candy|цукерка|🍬;ice cream|морозиво|🍦;honey|мед|🍯;juice|сік|🧃;water|вода|💧;tea|чай|🍵;coffee|кава|☕;salt|сіль|🧂;sandwich|бутерброд|🥪;donut|пончик|🍩;popcorn|попкорн|🍿
+eye|око|👁️;ear|вухо|👂;nose|ніс|👃;mouth|рот|👄;tooth|зуб|🦷;tongue|язик|👅;hand|рука,долоня|✋;leg|нога|🦵;foot|ступня,стопа|🦶;arm|рука|💪;heart|серце|❤️;brain|мозок|🧠;bone|кістка|🦴
+baby|немовля,малюк|👶;boy|хлопчик|👦;girl|дівчинка|👧;man|чоловік|👨;woman|жінка|👩;mom|мама|👩;dad|тато|👨;grandmother|бабуся|👵;grandfather|дідусь|👴;brother|брат|👦;sister|сестра|👧;family|сім’я,родина|👨‍👩‍👧‍👦;friend|друг,подруга|🤝;teacher|вчитель,вчителька|🧑‍🏫;doctor|лікар,доктор|🧑‍⚕️;king|король|🤴;queen|королева|👸
+red|червоний|🔴;blue|синій,блакитний|🔵;green|зелений|🟢;yellow|жовтий|🟡;pink|рожевий|🩷;purple|фіолетовий|🟣;brown|коричневий|🟤;black|чорний|⚫;white|білий|⚪
+one|один|1️⃣;two|два|2️⃣;three|три|3️⃣;four|чотири|4️⃣;five|п’ять|5️⃣;six|шість|6️⃣;seven|сім|7️⃣;eight|вісім|8️⃣;nine|дев’ять|9️⃣;ten|десять|🔟
+house|будинок,дім|🏠;door|двері|🚪;window|вікно|🪟;bed|ліжко|🛏️;chair|стілець|🪑;lamp|лампа,лампочка|💡;key|ключ|🔑;clock|годинник|🕐;phone|телефон|📱;computer|комп’ютер|💻;tv|телевізор|📺;camera|фотоапарат|📷;book|книга|📖;pencil|олівець|✏️;pen|ручка|🖊️;scissors|ножиці|✂️;bag|сумка|👜;backpack|рюкзак|🎒;umbrella|парасолька|☂️;ball|м’яч|⚽;teddy bear|плюшевий ведмедик|🧸;balloon|кулька|🎈;gift|подарунок|🎁;spoon|ложка|🥄;fork|виделка|🍴;soap|мило|🧼;toothbrush|зубна щітка|🪥;bath|ванна|🛁;toilet|туалет|🚽;broom|мітла|🧹;hammer|молоток|🔨;money|гроші|💰;flag|прапор|🚩;crown|корона|👑
+shirt|сорочка,футболка|👕;pants|штани|👖;dress|сукня|👗;shoe|взуття,черевик|👟;sock|шкарпетка|🧦;hat|капелюх|🎩;cap|кепка|🧢;glasses|окуляри|👓;coat|пальто|🧥;gloves|рукавички|🧤;scarf|шарф|🧣
+car|машина,автомобіль|🚗;bus|автобус|🚌;train|потяг|🚆;plane|літак|✈️;ship|корабель|🚢;boat|човен|⛵;bicycle|велосипед|🚲;motorcycle|мотоцикл|🏍️;truck|вантажівка|🚚;tractor|трактор|🚜;rocket|ракета|🚀;helicopter|вертоліт|🚁;taxi|таксі|🚕;ambulance|швидка допомога|🚑;fire truck|пожежна машина|🚒
+sun|сонце|☀️;moon|місяць|🌙;star|зірка|⭐;cloud|хмара|☁️;rain|дощ|🌧️;snow|сніг|❄️;wind|вітер|💨;fire|вогонь|🔥;rainbow|веселка|🌈;tree|дерево|🌳;flower|квітка|🌸;rose|троянда|🌹;leaf|листок|🍃;grass|трава|🌱;mountain|гора|⛰️;sea|море|🌊;beach|пляж|🏖️;volcano|вулкан|🌋;earth|земля,планета|🌍;lightning|блискавка|⚡
+school|школа|🏫;hospital|лікарня|🏥;shop|магазин|🏪;castle|замок|🏰;city|місто|🏙️;church|церква|⛪;bridge|міст|🌉;tent|намет|⛺
+sleep|спати,сон|😴;eat|їсти|🍽️;drink|пити|🥤;run|бігти,бігати|🏃;swim|плавати|🏊;dance|танцювати|💃;sing|співати|🎤;read|читати|📖;write|писати|✍️;cry|плакати|😢;laugh|сміятися|😂;think|думати|🤔;love|любов,любити|❤️;happy|щасливий,радісний|😊;sad|сумний|😢;angry|злий,сердитий|😠;scared|наляканий|😨;tired|втомлений|🥱;hot|гарячий,спекотний|🥵;cold|холодний|🥶;big|великий|🐘;small|малий,маленький|🐜;fast|швидкий|🏎️;slow|повільний|🐌
+music|музика|🎵;guitar|гітара|🎸;piano|піаніно|🎹;drum|барабан|🥁;paint|фарба,малювати|🎨;football|футбол|⚽;basketball|баскетбол|🏀;game|гра|🎮;trophy|кубок|🏆;medal|медаль|🏅;robot|робот|🤖;ghost|привид|👻;magic|магія,чарівність|✨
+go|йти,їхати;come|приходити;stand|стояти;sit|сидіти;walk|ходити,гуляти;jump|стрибати;climb|лазити,підійматися;fly|літати,муха;open|відкривати;close|закривати;give|давати;take|брати;make|робити;look|дивитися;see|бачити;hear|чути;listen|слухати;speak|говорити;say|казати;ask|питати;answer|відповідь,відповідати;know|знати;learn|вчити,навчатися;teach|навчати;study|вчитися;work|працювати,робота;help|допомагати,допомога;wait|чекати;buy|купувати;sell|продавати;wash|мити;cook|готувати,кухар;bake|пекти;cut|різати;draw|малювати;build|будувати;break|ламати;fix|ремонтувати;push|штовхати;pull|тягнути;throw|кидати;catch|ловити;kick|бити ногою;hug|обіймати;kiss|цілувати;smile|посміхатися,усмішка;shout|кричати;whisper|шепотіти;want|хотіти;need|потребувати;like|подобатися,любити;hate|ненавидіти;wake up|прокидатися;start|починати;stop|зупинятися;finish|закінчувати;find|знаходити;lose|губити,програвати;win|вигравати;try|намагатися;remember|пам’ятати;forget|забувати;share|ділитися;wear|носити;put|класти;bring|приносити;carry|нести;plant|садити,рослина;grow|рости;fall|падати,осінь;send|надсилати;call|телефонувати,кликати;live|жити;visit|відвідувати;travel|подорожувати
+good|добрий,хороший;bad|поганий;new|новий;old|старий;young|молодий;long|довгий;short|короткий;tall|високий;low|низький;wide|широкий;narrow|вузький;heavy|важкий;light|легкий,світлий,світло;hard|твердий,важкий;soft|м’який;wet|мокрий;dry|сухий;clean|чистий,прибирати;dirty|брудний;full|повний;empty|порожній;rich|багатий;poor|бідний;strong|сильний;weak|слабкий;beautiful|красивий;ugly|негарний;funny|смішний;kind|добрий,люб’язний;brave|сміливий;clever|розумний;lazy|лінивий;sweet|солодкий;sour|кислий;bitter|гіркий;salty|солоний;loud|гучний;quiet|тихий;dark|темний;bright|яскравий;round|круглий;sharp|гострий;thick|товстий;thin|тонкий;right|правильний,правий;wrong|неправильний;easy|легкий;difficult|важкий,складний;true|правдивий;false|хибний;same|такий самий;different|інший,різний;near|близько;far|далеко;early|рано;late|пізно;ready|готовий;busy|зайнятий;free|вільний,безкоштовний;safe|безпечний;dangerous|небезпечний;healthy|здоровий;sick|хворий;hungry|голодний;thirsty|спраглий;sleepy|сонний
+today|сьогодні;tomorrow|завтра;yesterday|вчора;morning|ранок;afternoon|день;evening|вечір;night|ніч;day|день;week|тиждень;month|місяць;year|рік;hour|година;minute|хвилина;second|секунда,другий;monday|понеділок;tuesday|вівторок;wednesday|середа;thursday|четвер;friday|п’ятниця;saturday|субота;sunday|неділя;january|січень;february|лютий;march|березень;april|квітень;may|травень;june|червень;july|липень;august|серпень;september|вересень;october|жовтень;november|листопад;december|грудень;spring|весна;summer|літо;autumn|осінь;winter|зима;now|зараз;always|завжди;never|ніколи;sometimes|іноді;often|часто;soon|скоро;birthday|день народження;holiday|свято,відпустка;weekend|вихідні
+i|я;you|ти,ви;he|він;she|вона;it|воно;we|ми;they|вони;this|це,цей;that|той,те;here|тут;there|там;what|що;where|де,куди;when|коли;who|хто;why|чому;how|як;yes|так;no|ні;please|будь ласка;thank you|дякую;sorry|вибач;hello|привіт;goodbye|до побачення;good morning|доброго ранку;good night|на добраніч;and|і,та;or|або;but|але;with|з;without|без;in|в;on|на;under|під;behind|за,позаду;between|між;next to|поруч;up|вгору;down|вниз;left|лівий,ліворуч;inside|всередині;outside|надворі;many|багато;few|мало;all|всі,все;every|кожний;more|більше;less|менше;very|дуже;again|знову
+farmer|фермер;driver|водій;pilot|пілот;police|поліція;firefighter|пожежник;nurse|медсестра;dentist|стоматолог;artist|художник;singer|співак;actor|актор;scientist|вчений;builder|будівельник;engineer|інженер;baker|пекар;waiter|офіціант;postman|листоноша;soldier|солдат;astronaut|астронавт;programmer|програміст
+desk|парта;notebook|зошит;ruler|лінійка;eraser|гумка;paper|папір;class|клас;lesson|урок;homework|домашнє завдання;letter|буква,лист;word|слово;number|число,номер;question|питання;picture|малюнок,картинка;map|карта;test|тест,перевірка;library|бібліотека;story|історія,казка;song|пісня;dream|мрія,сон
+kitchen|кухня;bedroom|спальня;bathroom|ванна кімната;garden|сад,город;yard|двір;roof|дах;wall|стіна;floor|підлога;stairs|сходи;fridge|холодильник;stove|плита;oven|духовка,піч;plate|тарілка;cup|чашка;glass|склянка,скло;bowl|миска;pot|каструля;pan|сковорідка;towel|рушник;blanket|ковдра;pillow|подушка;mirror|дзеркало;carpet|килим;sofa|диван;shelf|полиця;box|коробка;basket|кошик;bucket|відро;rope|мотузка;candle|свічка;toy|іграшка;doll|лялька;puzzle|пазл;cube|кубик;kite|повітряний змій
+river|річка;lake|озеро;forest|ліс;field|поле;island|острів;desert|пустеля;hill|пагорб;cave|печера;stone|камінь;sand|пісок;mud|бруд,багнюка;ice|лід;fog|туман;storm|буря,гроза;sky|небо;air|повітря;shadow|тінь;branch|гілка;root|корінь;seed|насіння;fruit|фрукт;vegetable|овоч;nest|гніздо;wing|крило;tail|хвіст;paw|лапа;horn|ріг;feather|перо;insect|комаха;worm|черв’як;eagle|орел;parrot|папуга;swan|лебідь;goose|гусь,гусак;rooster|півень;donkey|осел;puppy|цуценя;kitten|кошеня;lamb|ягня;mosquito|комар;ladybug|сонечко
+head|голова;face|обличчя;hair|волосся;neck|шия;shoulder|плече;back|спина,назад;chest|груди;stomach|живіт;finger|палець;knee|коліно;elbow|лікоть;skin|шкіра;lip|губа;cheek|щока;eyebrow|брова;nail|ніготь,цвях;beard|борода;blood|кров
+noodles|локшина;pasta|макарони;porridge|каша;jam|варення;sugar|цукор;flour|борошно;oil|олія;pepper|перець;garlic|часник;cabbage|капуста;beet|буряк;pumpkin|гарбуз;peas|горох;beans|квасоля;nuts|горіхи;raspberry|малина;blueberry|чорниця;plum|слива;apricot|абрикос;melon|диня;coconut|кокос;kiwi|ківі;mango|манго;sauce|соус;yogurt|йогурт;breakfast|сніданок;lunch|обід;dinner|вечеря;pie|пиріг;pancake|млинець;dumpling|вареник;borscht|борщ
+street|вулиця;road|дорога;market|ринок;bank|банк;airport|аеропорт;station|станція,вокзал;museum|музей;zoo|зоопарк;cinema|кінотеатр;theatre|театр;playground|дитячий майданчик;village|село;country|країна;world|світ;ukraine|Україна;kyiv|Київ
+eleven|одинадцять;twelve|дванадцять;thirteen|тринадцять;fourteen|чотирнадцять;fifteen|п’ятнадцять;sixteen|шістнадцять;seventeen|сімнадцять;eighteen|вісімнадцять;nineteen|дев’ятнадцять;twenty|двадцять;thirty|тридцять;forty|сорок;fifty|п’ятдесят;hundred|сто;thousand|тисяча;zero|нуль;first|перший;third|третій;last|останній;half|половина;pair|пара;gray|сірий;gold|золотий,золото;silver|срібний,срібло;colorful|різнокольоровий
+circle|коло,круг;square|квадрат,площа;triangle|трикутник;rectangle|прямокутник;oval|овал;line|лінія;point|точка,показувати;corner|кут
+bull|бик;rat|щур;moose|лось;seal|тюлень;walrus|морж;polar bear|білий ведмідь;lynx|рись;hare|заєць;crow|ворона;sparrow|горобець;pigeon|голуб;stork|лелека;woodpecker|дятел;cuckoo|зозуля;nightingale|соловей;peacock|павич;flamingo|фламінго;ostrich|страус;hamster|хом’як;guinea pig|морська свинка;lizard|ящірка;toad|ропуха;wasp|оса;beetle|жук;grasshopper|коник;dragonfly|бабка;jellyfish|медуза;starfish|морська зірка;seahorse|морський коник;lobster|омар;shrimp|креветка;salmon|лосось;cheetah|гепард;leopard|леопард;hippo|бегемот;rhino|носоріг;gorilla|горила;llama|лама;buffalo|буйвол;panther|пантера;raccoon|єнот;otter|видра;beaver|бобер;mole|кріт;badger|борсук;turkey|індик,Туреччина
+jacket|куртка;sweater|светр;jeans|джинси;skirt|спідниця;shorts|шорти;pajamas|піжама;boots|чоботи;sandals|сандалі;sneakers|кросівки;slippers|капці;belt|пояс;tie|краватка;uniform|форма;button|ґудзик,кнопка;pocket|кишеня;ring|каблучка,дзвінок;necklace|намисто;watch|наручний годинник,дивитися;wallet|гаманець;mask|маска;costume|костюм
+ladder|драбина;saw|пилка;axe|сокира;shovel|лопата;screw|гвинт;drill|дриль;paintbrush|пензлик;hose|шланг;lock|замок;flashlight|ліхтарик;battery|батарейка;wire|дріт;plug|вилка,розетка;bulb|лампочка;fan|вентилятор,фанат;heater|обігрівач;washing machine|пральна машина;vacuum cleaner|пилосос;iron|праска,залізо;sponge|губка;trash|сміття;bin|смітник;envelope|конверт;stamp|марка;parcel|посилка;newspaper|газета;magazine|журнал;calendar|календар;photo|фото;album|альбом
+internet|інтернет;website|вебсайт;email|електронна пошта;message|повідомлення;password|пароль;screen|екран;keyboard|клавіатура;printer|принтер;file|файл;app|застосунок;video|відео;charger|зарядний пристрій;headphones|навушники;microphone|мікрофон;speaker|динамік;tablet|планшет;laptop|ноутбук
+tennis|теніс;swimming|плавання;skiing|катання на лижах;skating|катання на ковзанах;gymnastics|гімнастика;running|біг;team|команда;player|гравець;coach|тренер;goal|гол,мета;referee|суддя;stadium|стадіон;race|гонка;score|рахунок;champion|чемпіон;whistle|свисток;helmet|шолом;net|сітка;racket|ракетка;skates|ковзани;ski|лижі
+surprised|здивований;proud|гордий;shy|сором’язливий;nervous|знервований;excited|схвильований;bored|знудьгований;lonely|самотній;jealous|заздрісний;worried|стурбований;calm|спокійний;curious|цікавий,допитливий;polite|ввічливий;honest|чесний;patient|терплячий;careful|обережний;friendly|привітний;generous|щедрий;selfish|егоїстичний;fear|страх;joy|радість;anger|гнів;hope|надія;peace|мир;freedom|свобода;truth|правда;friendship|дружба;kindness|доброта;courage|відвага
+thing|річ;place|місце;time|час;life|життя;people|люди;child|дитина;children|діти;person|людина;name|ім’я;age|вік;idea|ідея;problem|проблема;reason|причина;way|шлях,спосіб;part|частина;side|сторона;top|верх;bottom|низ;edge|край;middle|середина;center|центр;end|кінець;beginning|початок;example|приклад;plan|план;rule|правило;change|зміна,змінювати;choice|вибір;chance|шанс;luck|удача;secret|таємниця;surprise|сюрприз;trouble|біда;danger|небезпека;health|здоров’я;medicine|ліки;pill|таблетка;fever|температура,жар;cough|кашель;pain|біль;headache|головний біль;vaccine|вакцина;bandage|бинт
+lettuce|салат;spinach|шпинат;celery|селера;olive|оливка;grapefruit|грейпфрут;pomegranate|гранат;fig|інжир;raisin|ізюм;peanut|арахіс;almond|мигдаль;walnut|волоський горіх;sunflower|соняшник;wheat|пшениця;bun|булочка;toast|тост;cereal|пластівці;omelette|омлет;bacon|бекон;ham|шинка;steak|стейк;sushi|суші;taco|тако;hot dog|хот-дог;chips|чіпси;jelly|желе;pudding|пудинг;syrup|сироп;vinegar|оцет;mustard|гірчиця;ketchup|кетчуп;mayonnaise|майонез;smoothie|смузі;lemonade|лимонад;soda|газована вода;cocoa|какао;kefir|кефір;sour cream|сметана
+lawyer|юрист;judge|суддя;journalist|журналіст;writer|письменник;musician|музикант;dancer|танцівник;photographer|фотограф;designer|дизайнер;tailor|кравець;hairdresser|перукар;mechanic|механік;plumber|сантехнік;electrician|електрик;carpenter|тесля;fisherman|рибалка;sailor|моряк;guard|охоронець;cashier|касир;seller|продавець;librarian|бібліотекар;student|студент,учень;pupil|учень;boss|начальник;worker|працівник;manager|менеджер;analyst|аналітик;businessman|бізнесмен;president|президент;mayor|мер
+office|офіс;factory|завод;bakery|пекарня;pharmacy|аптека;post office|пошта;restaurant|ресторан;cafe|кафе;hotel|готель;supermarket|супермаркет;mall|торговий центр;gym|спортзал;pool|басейн;kindergarten|дитячий садок;university|університет;college|коледж;park|парк,паркувати;bus stop|автобусна зупинка;metro|метро;crossroads|перехрестя;traffic light|світлофор;sidewalk|тротуар;tunnel|тунель;port|порт;harbor|гавань;lighthouse|маяк;fountain|фонтан;monument|пам’ятник;palace|палац;tower|вежа;gate|ворота;fence|паркан
+ride|їхати верхи,кататися;drive|керувати,їхати за кермом;pay|платити;cost|коштувати;count|рахувати;measure|вимірювати;weigh|важити;mix|змішувати;pour|наливати;fill|наповнювати;boil|кип’ятити;fry|смажити;peel|чистити;chop|нарізати;taste|куштувати,смак;smell|нюхати,запах;touch|торкатися;feel|відчувати;breathe|дихати;sneeze|чхати;yawn|позіхати;wave|махати,хвиля;clap|плескати;nod|кивати;shake|трясти;turn|повертати;spin|крутитися;slide|ковзати;slip|послизнутися;crawl|повзати;hop|стрибати;bend|згинати;stretch|розтягувати;lift|піднімати;drop|кидати,падіння;hold|тримати;grab|хапати;hide|ховатися;seek|шукати;search|шукати;show|показувати;hurry|поспішати;rest|відпочивати,решта;relax|розслаблятися;imagine|уявляти;believe|вірити;decide|вирішувати;choose|вибирати;agree|погоджуватися;refuse|відмовлятися;promise|обіцяти;invite|запрошувати;welcome|вітати;greet|вітатися;thank|дякувати;apologize|вибачатися;forgive|пробачати;hurt|боліти,ранити;heal|лікувати,гоїтися;save|рятувати,зберігати;protect|захищати;rescue|рятувати;follow|слідувати;lead|вести;join|приєднуватися;leave|залишати,йти;arrive|прибувати;return|повертатися;enter|входити;exit|виходити,вихід;move|рухатися;stay|залишатися;mean|означати;explain|пояснювати;describe|описувати;discuss|обговорювати;spell|вимовляти по буквах;pronounce|вимовляти;translate|перекладати;repeat|повторювати;practice|практикувати,практика;improve|покращувати;succeed|досягати успіху;fail|зазнавати невдачі
+quickly|швидко;slowly|повільно;carefully|обережно;loudly|голосно;quietly|тихо;together|разом;alone|сам,самотній;maybe|можливо;almost|майже;enough|досить;only|тільки;just|просто,щойно;still|ще,досі;already|вже;ever|коли-небудь;around|навколо;across|через;along|вздовж;through|крізь;into|в;over|над;above|вище;below|нижче;before|до,перед;after|після;during|під час;until|до;about|про,приблизно;against|проти;toward|назустріч;beside|поруч;opposite|навпроти;front|перед,фронт
+which|який;whose|чий;my|мій;your|твій;his|його;her|її;our|наш;their|їхній;me|мене,мені;him|його;us|нас;them|їх;something|щось;nothing|нічого;everything|все;everyone|всі;someone|хтось;nobody|ніхто;each|кожен;other|інший;another|ще один;both|обидва;much|багато;most|більшість
+math|математика;science|наука,природознавство;history|історія;geography|географія;biology|біологія;chemistry|хімія;physics|фізика;art|мистецтво;language|мова;english|англійська;ukrainian|українська;grammar|граматика;dictionary|словник;textbook|підручник;pencil case|пенал;marker|маркер;chalk|крейда;glue|клей;tape|скотч,стрічка;calculator|калькулятор;globe|глобус;bell|дзвінок;recess|перерва;schedule|розклад;grade|оцінка,клас;mark|оцінка,позначка;certificate|сертифікат;exercise|вправа;sentence|речення;page|сторінка;title|назва;chapter|розділ;author|автор;poem|вірш;fairy tale|казка
+hero|герой;princess|принцеса;prince|принц;knight|лицар;dragon|дракон;witch|відьма;wizard|чарівник;fairy|фея;giant|велетень;monster|монстр,потвора;mermaid|русалка;pirate|пірат;treasure|скарб;sword|меч;shield|щит;angel|ангел
+weather|погода;sunny|сонячний;cloudy|хмарний;rainy|дощовий;windy|вітряний;snowy|сніжний;foggy|туманний;temperature|температура;degree|градус;thunder|грім;flood|повінь;earthquake|землетрус;hurricane|ураган;puddle|калюжа;icicle|бурулька;snowman|сніговик;snowflake|сніжинка;frost|мороз,паморозь;dew|роса;sunrise|схід сонця;sunset|захід сонця;heat|спека;breeze|вітерець
+space|космос;planet|планета;galaxy|галактика;comet|комета;satellite|супутник;telescope|телескоп;spaceship|космічний корабель;alien|прибулець;mars|Марс;jupiter|Юпітер;saturn|Сатурн;venus|Венера;universe|всесвіт;orbit|орбіта;gravity|гравітація
+ocean|океан;coast|узбережжя;shore|берег;bay|затока;waterfall|водоспад;pond|ставок;stream|струмок;swamp|болото;iceberg|айсберг;anchor|якір;sail|парус;captain|капітан;submarine|підводний човен;raft|пліт;coral|корал;pearl|перлина;seaweed|водорості;dive|пірнати;float|триматися на воді;sink|тонути,раковина
+america|Америка;england|Англія;france|Франція;germany|Німеччина;poland|Польща;italy|Італія;spain|Іспанія;japan|Японія;china|Китай;canada|Канада;africa|Африка;europe|Європа;asia|Азія;australia|Австралія;egypt|Єгипет;india|Індія;brazil|Бразилія;mexico|Мексика;sweden|Швеція;norway|Норвегія;greece|Греція;lviv|Львів;odesa|Одеса;kharkiv|Харків;dnipro|Дніпро;carpathians|Карпати;capital|столиця;border|кордон;foreign|іноземний
+christmas|Різдво;new year|Новий рік;easter|Великдень;party|вечірка;celebration|святкування;present|подарунок,теперішнє;fireworks|феєрверк;carnival|карнавал;wedding|весілля;invitation|запрошення;greeting card|вітальна листівка;christmas tree|ялинка;victory|перемога
+hobby|хобі;collection|колекція;painting|живопис,картина;drawing|малювання,малюнок;knitting|в’язання;sewing|шиття;needle|голка;thread|нитка;fabric|тканина;wool|вовна;cotton|бавовна;silk|шовк;brush|щітка,пензлик;canvas|полотно;clay|глина;origami|орігамі;fishing|риболовля;camping|похід з наметами;hiking|піший похід;picnic|пікнік;barbecue|шашлик;board game|настільна гра;chess|шахи;cards|карти;domino|доміно
+instrument|інструмент;violin|скрипка;flute|флейта;trumpet|труба;accordion|акордеон;harp|арфа;concert|концерт;orchestra|оркестр;choir|хор;melody|мелодія;rhythm|ритм;note|нота,записка;band|гурт
+price|ціна;cheap|дешевий;expensive|дорогий;coin|монета;cash|готівка;card|картка;discount|знижка;receipt|чек;bill|рахунок;customer|покупець;shopping|покупки;cart|візок;package|упаковка;size|розмір;salary|зарплата;tax|податок;budget|бюджет
+trip|поїздка;journey|подорож;ticket|квиток;passport|паспорт;suitcase|валіза;luggage|багаж;tourist|турист;guide|гід,путівник;flight|переліт;customs|митниця;visa|віза;adventure|пригода;souvenir|сувенір;vacation|відпустка
+neighbor|сусід;guest|гість;stranger|незнайомець;crowd|натовп;group|група;member|член;leader|лідер;citizen|громадянин;law|закон;government|уряд;vote|голосувати;news|новини;radio|радіо;advertisement|реклама
+muscle|м’яз;lung|легеня;throat|горло;ankle|щиколотка;wrist|зап’ястя;palm|долоня;toe|палець ноги;heel|п’ята;spine|хребет;rib|ребро;tear|сльоза;sweat|піт;breath|дихання;voice|голос;patient|пацієнт;thermometer|термометр;injection|укол;operation|операція;wound|рана
+wonderful|чудовий;terrible|жахливий;amazing|дивовижний;boring|нудний;interesting|цікавий;important|важливий;special|особливий;ordinary|звичайний;strange|дивний;famous|відомий;popular|популярний;modern|сучасний;ancient|давній;fresh|свіжий;rotten|гнилий;ripe|стиглий;raw|сирий;fried|смажений;boiled|варений;frozen|заморожений;sticky|липкий;smooth|гладкий;rough|шорсткий;shiny|блискучий;transparent|прозорий;invisible|невидимий;mysterious|таємничий;silent|мовчазний;noisy|галасливий;crowded|людний;peaceful|мирний;wild|дикий;tame|ручний;domestic|домашній;wooden|дерев’яний;plastic|пластиковий;metal|метал;rubber|гума;steel|сталь
+allow|дозволяти;forbid|забороняти;offer|пропонувати;accept|приймати;receive|отримувати;reply|відповідати;create|створювати;invent|винаходити;discover|відкривати;explore|досліджувати;compare|порівнювати;connect|з’єднувати;separate|розділяти;collect|збирати;gather|збиратися;sort|сортувати;organize|організовувати;prepare|готувати,готуватися;tidy|прибирати;repair|ремонтувати;replace|замінювати;use|використовувати;waste|витрачати даремно;spend|витрачати,проводити;earn|заробляти;borrow|позичати у когось;lend|позичати комусь;wish|бажати,бажання;expect|очікувати;guess|вгадувати;wonder|дивуватися;notice|помічати;understand|розуміти;remind|нагадувати;suggest|пропонувати;warn|попереджати;advise|радити;support|підтримувати;care|піклуватися;trust|довіряти;fight|боротися,бійка;argue|сперечатися
+how are you|як справи,як ти;what is your name|як тебе звати;my name is|мене звати;nice to meet you|приємно познайомитися;i love you|я тебе люблю;i do not know|я не знаю;excuse me|перепрошую;you are welcome|будь ласка;good evening|добрий вечір;good afternoon|добрий день;see you later|до зустрічі;see you tomorrow|до завтра;how much is it|скільки це коштує;where is the toilet|де туалет;help me|допоможи мені;i am hungry|я голодний;i am thirsty|я хочу пити;i am tired|я втомився;i want to play|я хочу гратися;let us go|ходімо;look at this|подивись на це;be careful|будь обережний;wait for me|зачекай на мене;come here|іди сюди;come on|давай;never mind|нічого страшного;of course|звісно;i like it|мені подобається;i do not like it|мені не подобається;i can|я можу;i can not|я не можу;i have|у мене є;do you speak english|ти говориш англійською;i do not understand|я не розумію;please repeat|повтори будь ласка;happy birthday|з днем народження;merry christmas|з Різдвом;happy new year|з Новим роком;congratulations|вітаю;good luck|успіхів;take care|бережи себе
+tulip|тюльпан;daisy|ромашка;lily|лілія;poppy|мак;cornflower|волошка;dandelion|кульбаба;lavender|лаванда;cactus|кактус;bush|кущ;moss|мох;pine|сосна;oak|дуб;birch|береза;maple|клен;willow|верба;bamboo|бамбук;vine|лоза;petal|пелюстка;stem|стебло;bud|бутон;thorn|шип;bark|кора,гавкіт;log|колода;acorn|жолудь;pinecone|шишка;berry|ягода;greenhouse|теплиця;meadow|луг;valley|долина;cliff|скеля;canyon|каньйон;glacier|льодовик;rock|скеля,камінь;pebble|камінчик;dust|пил;smoke|дим;flame|полум’я;spark|іскра;ash|попіл;steam|пара;bubble|бульбашка
+attic|горище;basement|підвал;balcony|балкон;garage|гараж;hall|зал,передпокій;curtain|штора;wardrobe|шафа;drawer|шухляда;kettle|чайник;teapot|заварник;tray|піднос;jar|банка;lid|кришка;ladle|половник;grater|тертка;cutting board|різальна дошка;chimney|димар;fireplace|камін;doorbell|дверний дзвінок;armchair|крісло;bookshelf|книжкова полиця;crib|ліжечко;hanger|вішак;salad|салат;stew|рагу;cutlet|котлета;spaghetti|спагеті;croissant|круасан;waffle|вафля;muffin|кекс;marshmallow|зефір;caramel|карамель;lollipop|льодяник;ginger|імбир;cinnamon|кориця;vanilla|ваніль;mint|м’ята;basil|базилік;parsley|петрушка;dill|кріп
+uncle|дядько;aunt|тітка;cousin|двоюрідний брат,двоюрідна сестра;nephew|племінник;niece|племінниця;grandson|онук;granddaughter|онука;parents|батьки;husband|чоловік;wife|дружина;twins|близнюки;relative|родич;stepfather|вітчим;stepmother|мачуха;son|син;daughter|дочка;couple|подружжя;bride|наречена;groom|наречений;adult|дорослий;teenager|підліток;kid|дитина,малюк;elderly|літній
+decade|десятиліття;century|століття;moment|мить;midnight|північ;noon|полудень;dawn|світанок;future|майбутнє;past|минуле;daily|щоденний;weekly|щотижневий;yearly|щорічний;anniversary|річниця;million|мільйон;billion|мільярд;twice|двічі;once|одного разу,колись;single|єдиний,неодружений;double|подвійний;dozen|дюжина;percent|відсоток;plus|плюс;minus|мінус;fraction|дріб;even|парний,навіть;odd|непарний,дивний
+because|тому що;so|тому,отже;then|тоді;if|якщо;than|ніж;while|поки;as|як,бо;however|проте;instead|замість;really|справді;probably|ймовірно;certainly|звичайно;usually|зазвичай;quite|досить;actually|насправді;finally|нарешті;suddenly|раптом;immediately|негайно;recently|нещодавно;later|пізніше;forever|назавжди;everywhere|скрізь;somewhere|десь;nowhere|ніде;upstairs|нагору;downstairs|вниз;forward|вперед;away|геть;home|додому,вдома;abroad|за кордоном;also|також;too|також,занадто;except|крім;unless|якщо не;whether|чи
+scooter|самокат;skateboard|скейтборд;sled|санки;tram|трамвай;trolleybus|тролейбус;minibus|маршрутка;van|фургон;cable car|канатна дорога;ferry|пором;jet|реактивний літак;parachute|парашут;wheel|колесо;engine|двигун;steering wheel|кермо;seat belt|ремінь безпеки;brake|гальмо;tire|шина;pedal|педаль;seat|сидіння,місце;fuel|пальне;gas station|заправка;parking|парковка;highway|траса;railway|залізниця;platform|платформа;passenger|пасажир
+brush teeth|чистити зуби;take a shower|приймати душ;get dressed|одягатися;go to bed|лягати спати;have breakfast|снідати;have lunch|обідати;have dinner|вечеряти;wash hands|мити руки;comb hair|розчісувати волосся;tie shoes|зав’язувати шнурки;do homework|робити домашнє завдання;go to school|йти до школи;play outside|гратися надворі;watch tv|дивитися телевізор;read a book|читати книгу;clean up|прибирати;set the table|накривати на стіл;take a nap|подрімати;get up|вставати;sit down|сідати;stand up|підводитися;turn on|вмикати;turn off|вимикати;open the door|відчинити двері;close the window|зачинити вікно;make the bed|застелити ліжко;feed the cat|нагодувати кота;walk the dog|вигулювати собаку;water the plants|поливати рослини;take out the trash|винести сміття;wash the dishes|мити посуд;cook dinner|готувати вечерю
+barn|комора;stable|стайня;hay|сіно;straw|солома;pasture|пасовище;herd|стадо;flock|зграя,отара;shepherd|пастух;hen|курка;chick|курча;calf|теля;foal|лоша;piglet|поросятко;duckling|каченя;cub|дитинча;fawn|оленя;pony|поні;beehive|вулик;web|павутиння;cage|клітка;aquarium|акваріум;zookeeper|доглядач зоопарку;circus|цирк;clown|клоун;magician|фокусник;acrobat|акробат;juggler|жонглер;trick|фокус;meow|няв;woof|гав;moo|му;quack|кря;oink|ріх;roar|ревіти,рев;growl|гарчати;hiss|шипіти;buzz|дзижчати;chirp|цвірінькати;howl|вити;croak|кумкати;squeak|пищати
+tiny|крихітний;huge|величезний;gentle|ніжний;rude|грубий;cruel|жорстокий;fair|справедливий;guilty|винний;innocent|невинний;silly|безглуздий;serious|серйозний;cheerful|життєрадісний;gloomy|похмурий;cozy|затишний;comfortable|зручний;uncomfortable|незручний;plain|простий;simple|простий;complex|складний;useful|корисний;useless|марний;harmful|шкідливий;lucky|везучий,щасливий;unlucky|невдалий;awake|неспаний;asleep|сплячий;alive|живий;dead|мертвий;deaf|глухий;blind|сліпий;clumsy|незграбний;graceful|граційний;elegant|елегантний;messy|безладний;neat|охайний;spicy|пікантний;tasty|смачний;delicious|дуже смачний;disgusting|огидний;juicy|соковитий;crispy|хрусткий;creamy|вершковий;flat|плоский;steep|крутий;slippery|слизький;solid|твердий;liquid|рідина;gas|газ
+atom|атом;energy|енергія;electricity|електрика;magnet|магніт;experiment|експеримент;laboratory|лабораторія;microscope|мікроскоп;invention|винахід;machine|машина,механізм;gear|шестерня;motor|мотор;solar|сонячний;signal|сигнал;sound|звук;echo|відлуння;speed|швидкість;weight|вага;length|довжина;height|висота;width|ширина;depth|глибина;area|площа;volume|об’єм,гучність;liter|літр;kilogram|кілограм;gram|грам;ton|тонна;meter|метр;kilometer|кілометр;centimeter|сантиметр
+download|завантажувати;upload|вивантажувати;click|клікати;type|друкувати;scroll|прокручувати;browser|браузер;link|посилання;folder|папка;icon|значок;menu|меню;cursor|курсор;wifi|вай-фай;network|мережа;server|сервер;data|дані;code|код;software|програмне забезпечення;virus|вірус;update|оновлювати,оновлення;laughter|сміх;sorrow|смуток;pride|гордість;shame|сором;envy|заздрість;fun|веселщі;mood|настрій;feeling|почуття;memory|пам’ять;thought|думка;mind|розум;soul|душа;spirit|дух
+hoodie|худі;vest|жилет;suit|костюм;raincoat|дощовик;swimsuit|купальник;underwear|білизна;apron|фартух;ribbon|стрічка;bow|бант;earrings|сережки;bracelet|браслет;sunglasses|сонцезахисні окуляри;handbag|сумочка
+mineral water|мінеральна вода;milkshake|молочний коктейль;broth|бульйон;oatmeal|вівсянка;bagel|бублик;pretzel|крендель;popsicle|ескімо;whipped cream|збиті вершки;peanut butter|арахісова паста;chewing gum|жувальна гумка;cracker|крекер;biscuit|бісквіт;toffee|іриска;lime|лайм;tangerine|мандарин;nectarine|нектарин;papaya|папайя;cranberry|журавлина;currant|смородина;gooseberry|агрус;blackberry|ожина;zucchini|кабачок;eggplant|баклажан;bell pepper|солодкий перець;chili|гострий перець;radish|редиска;turnip|ріпа;leek|порей;asparagus|спаржа;cauliflower|цвітна капуста;herbs|зелень
+north|північ;south|південь;east|схід;west|захід;direction|напрямок;compass|компас;straight|прямий;vertical|вертикальний;horizontal|горизонтальний;angle|кут;diameter|діаметр;radius|радіус;sphere|сфера;cylinder|циліндр;cone|конус,ріжок;pyramid|піраміда;arrow|стрілка;cross|хрест;spiral|спіраль;pattern|візерунок;stripe|смужка;dot|крапка
+match|матч,сірник;tournament|турнір;defeat|поразка;penalty|пенальті;goalkeeper|воротар;striker|нападник;defender|захисник;pitch|поле;court|корт;track|доріжка,траса;lap|коло;marathon|марафон;sprint|спринт;jump rope|скакалка;trampoline|батут;swing|гойдалка;seesaw|гойдалка-балансир;sandbox|пісочниця;climbing|скелелазіння;yoga|йога;workout|тренування;dumbbell|гантеля
+vyshyvanka|вишиванка;wreath|вінок;bandura|бандура;cossack|козак;hryvnia|гривня;black sea|Чорне море;steppe|степ;chernihiv|Чернігів;poltava|Полтава;zaporizhzhia|Запоріжжя;vinnytsia|Вінниця;uzhhorod|Ужгород;pampushky|пампушки;salo|сало;holubtsi|голубці;deruny|деруни;kvass|квас;kutia|кутя;paska|паска;uzvar|узвар;syrniki|сирники
+belgium|Бельгія;netherlands|Нідерланди;switzerland|Швейцарія;austria|Австрія;portugal|Португалія;ireland|Ірландія;scotland|Шотландія;finland|Фінляндія;denmark|Данія;czech republic|Чехія;hungary|Угорщина;romania|Румунія;bulgaria|Болгарія;lithuania|Литва;latvia|Латвія;estonia|Естонія;georgia|Грузія;israel|Ізраїль;korea|Корея;thailand|Таїланд;vietnam|В’єтнам;argentina|Аргентина;cuba|Куба;morocco|Марокко;kenya|Кенія;arctic|Арктика;antarctica|Антарктида;german|німецька;french|французька;spanish|іспанська;italian|італійська;polish|польська;japanese|японська;chinese|китайська
+koala|коала;toucan|тукан;pelican|пелікан;seagull|чайка;heron|чапля;crane|журавель,кран;falcon|сокіл;hawk|яструб;vulture|гриф;raven|ворон;magpie|сорока;jay|сойка;robin|малинівка;swallow|ластівка;hyena|гієна;jackal|шакал;coyote|койот;antelope|антилопа;gazelle|газель;bison|зубр,бізон;yak|як;reindeer|північний олень;boar|кабан;weasel|ласка;ferret|тхір;skunk|скунс;armadillo|броненосець;sloth|лінивець;anteater|мурахоїд;platypus|качконос;lemur|лемур;chimpanzee|шимпанзе;orangutan|орангутан;sea lion|морський лев;manatee|ламантин;stingray|скат;eel|вугор;trout|форель;carp|короп;pike|щука;catfish|сом;tuna|тунець;sardine|сардина;oyster|устриця;squid|кальмар;sea urchin|морський їжак;cricket|цвіркун;moth|міль;caterpillar|гусінь;cocoon|кокон;bumblebee|джміль;firefly|світляк;flea|блоха;scorpion|скорпіон;centipede|багатоніжка;gecko|геккон;chameleon|хамелеон;iguana|ігуана;cobra|кобра;python|пітон;alligator|алігатор
+elf|ельф;gnome|гном;troll|троль;goblin|гоблін;phoenix|фенікс;kingdom|королівство;throne|трон;armor|обладунок;potion|зілля;wand|чарівна паличка;cauldron|казан;crystal|кристал;gem|самоцвіт;diamond|діамант;ruby|рубін;emerald|смарагд;legend|легенда;myth|міф;fable|байка;riddle|загадка
+kneel|ставати на коліна;lean|нахилятися;lie|лежати,брехати;tiptoe|ходити навшипиньки;stomp|топати;tap|стукати;knock|стукати у двері;pinch|щипати;tickle|лоскотати;scratch|чухати,дряпати;rub|терти;squeeze|стискати;stir|помішувати;spill|розливати;drip|капати;splash|хлюпатися;melt|танути;freeze|замерзати;burn|горіти,палити;shine|світити,сяяти;glow|світитися;sparkle|виблискувати;fade|тьмяніти;bloom|цвісти;shrink|зменшуватися;drift|дрейфувати;roll|котитися;bounce|відскакувати;glide|планувати;land|приземлятися,земля;dig|копати;bury|закопувати;harvest|збирати врожай,врожай;sow|сіяти;feed|годувати;pet|гладити,улюбленець;chase|гнатися;escape|тікати;sneak|підкрадатися;peek|підглядати;stare|дивитися пильно;glance|кинути погляд;blink|кліпати;wink|підморгувати;frown|хмуритися;grin|усміхатися широко;giggle|хихотіти;sob|ридати;sigh|зітхати;groan|стогнати;mumble|бубоніти;scream|вричати;hum|наспівувати;chat|розмовляти;joke|жартувати,жарт;tease|дражнити;praise|хвалити;scold|лаяти;blame|звинувачувати;reward|нагороджувати,нагорода;compete|змагатися
+stool|табурет;bench|лавка;hook|гачок;screwdriver|викрутка;wrench|гайковий ключ;toolbox|ящик для інструментів;sandpaper|наждачний папір;roller|валик;lawn|газон;lawnmower|газонокосарка;rake|граблі;hoe|мотика;watering can|лійка;wheelbarrow|тачка;flowerpot|квітковий горшик;birdhouse|шпаківня;scarecrow|опудало;hammock|гамак;mailbox|поштова скринька;doormat|килимок;dustpan|совок;mop|швабра;detergent|мийний засіб;laundry|прання;ironing board|прасувальна дошка;sewing machine|швейна машина
+stapler|степлер;paper clip|скріпка;scanner|сканер;meeting|зустріч;project|проєкт;deadline|термін;report|звіт;contract|договір;client|клієнт;colleague|колега;interview|співбесіда;resume|резюме;career|кар’єра;profession|професія;company|компанія;business|бізнес;product|продукт;service|послуга;sale|розпродаж;order|замовлення;delivery|доставка;courier|кур’єр;warehouse|склад;supply|постачання;invoice|рахунок-фактура;profit|прибуток;loss|збиток;add|додавати;subtract|віднімати;multiply|множити;divide|ділити;sum|сума;equal|рівний;greater|більший;smaller|менший;digit|цифра;graph|графік;chart|діаграма;table|стіл,таблиця;list|список;row|ряд;column|стовпець
+fist|кулак;eyelash|вія;fingerprint|відбиток пальця;freckle|веснянка;wrinkle|зморшка;scar|шрам;flu|грип;allergy|алергія;vitamin|вітамін;plaster|пластир;crutch|милиця;wheelchair|інвалідний візок;stethoscope|стетоскоп;x-ray|рентген;appointment|прийом;emergency|надзвичайна ситуація;first aid|перша допомога;diet|дієта;siren|сирена;shelter|укриття;alarm|тривога;volunteer|волонтер;helper|помічник`;
+const D=new Map(),R=new Map();
+DICT.split(/[;\n]/).filter(Boolean).forEach(l=>{const[e,u,m]=l.split("|");const o={en:e,uk:u.split(","),emoji:m};D.set(e,o);o.uk.forEach(x=>{const k=x.toLowerCase();if(!R.has(k))R.set(k,o)})});
+$("dl").innerHTML=[...D.keys()].map(k=>`<option value="${k}">`).join("");
+function tr(){
+ const q=$("w").value.trim().toLowerCase();if(!q)return;
+ const o=D.get(q)||R.get(q);
+ cur=o?{en:o.en,opts:o.uk.slice(),sel:new Set([0]),emoji:o.emoji||""}:{en:q,opts:[],sel:new Set(),emoji:"🖼️",manual:true};
+ const sv=words.find(w=>w.en===cur.en);
+ if(sv){cur.sel=new Set();sv.uk.forEach(u=>{let i=cur.opts.indexOf(u);if(i<0){cur.opts.push(u);i=cur.opts.length-1}cur.sel.add(i)});cur.emoji=sv.emoji;cur.img=sv.img;cur.manual=false}
+ renderRes();
+}
+$("prac").addEventListener("click",()=>{if(!words.length)return;startGame(Math.floor(Math.random()*words.length));renderLearn()});
+$("res").addEventListener("change",e=>{
+ const f=e.target.id==="file"&&e.target.files[0];if(!f)return;
+ const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement("canvas");c.width=c.height=160;const s=Math.min(im.width,im.height);c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,160,160);cur.img=c.toDataURL("image/jpeg",.75);renderRes()};im.src=r.result};r.readAsDataURL(f)});
+$("go").addEventListener("click",tr);
+$("w").addEventListener("keydown",e=>{if(e.key==="Enter")tr()});
+try{speechSynthesis.getVoices()}catch(e){}
+renderGrid();
+</script></body></html>
